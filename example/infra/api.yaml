@@ -1,0 +1,55 @@
+
+Resources:
+  OpenSearchDomain:
+    Type: AWS::OpenSearch::Domain
+    Properties:
+      DomainName: blog-search-domain
+      ElasticsearchVersion: 7.10
+      ElasticsearchClusterConfig:
+        InstanceType: t2.small.elasticsearch
+        InstanceCount: 1
+      EBSOptions:
+        EBSEnabled: true
+        VolumeSize: 10
+
+  BlogAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: BlogApi
+      StageName: Prod
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            UserPoolArn: !GetAtt AppUserPool.Arn
+      DefinitionBody:
+        swagger: "2.0"
+        info:
+          title: {Ref: "AWS::StackName"}
+        paths:
+          /posts:
+            get:
+              x-amazon-apigateway-integration:
+                httpMethod: post
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetPostsFunction.Arn}/invocations
+              responses:
+                200:
+                  description: "200 response"
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: post
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PostManagementFunction.Arn}/invocations
+              responses:
+                200:
+                  description: "200 response"
+          /posts/images:
+            post:
+              x-amazon-apigateway-integration:
+                httpMethod: post
+                type: aws_proxy
+                uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PostImageUploadFunction.Arn}/invocations
+              responses:
+                200:
+                  description: "200 response"

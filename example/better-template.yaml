@@ -1,0 +1,21 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+Description: >
+  Main template for ServerlessBlogApp, including nested stacks for various resources.
+
+Resources:
+  Include:
+    - "./infra/api.yaml"
+    - "./infra/auth.yaml"
+    - "./infra/databases.yaml"
+    - "./infra/events.yaml"
+    - "./infra/storage.yaml"
+    - "./infra/users-pool.yaml"
+    - "./functions/functions.yaml"
+
+Outputs:
+  BlogApiUrl:
+    Description: "API Gateway endpoint URL for Prod stage for Blog application"
+    Value: !Sub "https://${ApiResources}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Export:
+      Name: BlogApiUrl

@@ -1,0 +1,89 @@
+
+Resources:
+  PostImageUploadFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: upload.handler
+      Runtime: nodejs14.x
+      CodeUri: ./src
+      Environment:
+        Variables:
+          S3_BUCKET: !Ref S3Bucket
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref S3Bucket
+      
+  PostManagementFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: postManagement.handler
+      Runtime: nodejs14.x
+      CodeUri: ./src
+      Environment:
+        Variables:
+          BLOG_TABLE: !Ref BlogTable
+          USER_TABLE: !Ref UserTable
+          REDIS_CLUSTER: !Ref RedisCluster
+          OPENSEARCH_DOMAIN: !GetAtt OpenSearchDomain.DomainEndpoint
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref BlogTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserTable
+        - ElastiCachePolicy:
+            CacheClusterId: !Ref RedisCluster
+      
+  GetPostsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: getPosts.handler
+      Runtime: nodejs14.x
+      CodeUri: ./src
+      Environment:
+        Variables:
+          BLOG_TABLE: !Ref BlogTable
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref BlogTable
+
+  NotifyUserFunctionRole:
+    Type: AWS::IAM::Role
+    Properties: 
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement: 
+          - Effect: Allow
+            Principal:
+              Service: 
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+
+  NotifyUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: sendNotification.handler
+      Runtime: nodejs14.x
+      CodeUri: ./src
+      Environment:
+        Variables:
+          EMAIL_FROM: no-reply@serverlessblogapp.com
+      Role: !GetAtt NotifyUserFunctionRole.Arn
+      Events:
+        UserSignUp:
+          Type: Cognito
+          Properties:
+            UserPool: !Ref AppUserPool
+            Trigger: PreSignup
+
+  CleanupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: cleanup.handler
+      Runtime: nodejs14.x
+      CodeUri: ./src
+      Environment:
+        Variables:
+          S3_BUCKET: !Ref S3Bucket
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref S3Bucket

@@ -1,0 +1,28 @@
+Resources:
+  BlogTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: BlogPostsTable
+      AttributeDefinitions: 
+        - AttributeName: postId
+          AttributeType: S
+      KeySchema: 
+        - AttributeName: postId
+          KeyType: HASH
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+
+  UserTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: UserTable
+      AttributeDefinitions: 
+        - AttributeName: userId
+          AttributeType: S
+      KeySchema: 
+        - AttributeName: userId
+          KeyType: HASH
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5

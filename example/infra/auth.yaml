@@ -1,0 +1,38 @@
+Resources:
+  MyUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: MyUserPool
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireUppercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          Mutable: true
+          Required: true
+        - Name: phoneNumber
+          AttributeDataType: String
+          Mutable: true
+          Required: false
+      AutoVerifiedAttributes:
+        - email
+      EmailVerificationSubject: Verify your email address
+      EmailVerificationMessage: Please click the link below to verify your email address.
+      SmsVerificationMessage: Your verification code is {####}.
+      MfaConfiguration: OFF
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+        UnusedAccountValidityDays: 7
+        InviteMessageTemplate:
+          EmailMessage: Your username is {username} and temporary password is {####}.
+          EmailSubject: Your temporary password
+          SMSMessage: Your username is {username} and temporary password is {####}.
+      UsernameAttributes:
+        - email
+      UsernameConfiguration:
+        CaseSensitive: false

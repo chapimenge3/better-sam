@@ -1,0 +1,14 @@
+Resources:
+  AppUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: blogAppUserPool
+      AutoVerifiedAttributes:
+        - email
+
+  AppUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: blogAppUserPoolClient
+      UserPoolId: !Ref AppUserPool
+      GenerateSecret: false

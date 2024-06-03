@@ -1,0 +1,9 @@
+Resources:
+  CloudWatchEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      ScheduleExpression: rate(1 day)
+      State: ENABLED
+      Targets:
+        - Arn: !GetAtt CleanupFunction.Arn
+          Id: "CleanupFunction"
