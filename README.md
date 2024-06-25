@@ -1,3 +1,6 @@
+# This project is unstable at the moment and it is under development
+
+
 # better-sam
 
 This project aims to make it easier to separate large AWS SAM template files and script assembly using AWS SAM CLI. 
